@@ -1,0 +1,22 @@
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <account_id>.dkr.ecr.<region>.amazonaws.com
+
+Build the Docker image:
+docker build -t nodejs-eks-app .
+Tag the image for ECR:
+docker tag nodejs-eks-app:latest <account_id>.dkr.ecr.<region>.amazonaws.com/nodejs-eks-app:latest
+Push the image:
+docker push <account_id>.dkr.ecr.<region>.amazonaws.com/nodejs-eks-app:latest
+
+
+Use eksctl to create the cluster:
+
+eksctl create cluster \
+  --name nodejs-cluster \
+  --region <region> \
+  --fargate
+
+
+eksctl create cluster \
+  --name nodejs-cluster \
+  --region <region> \
+  --fargate
