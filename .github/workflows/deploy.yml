@@ -29,13 +29,18 @@ jobs:
         aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 957628066752.dkr.ecr.eu-north-1.amazonaws.com
 
     - name: Build and Push Docker Image
+      env:
+        IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t nodejs-eks-app .
-        docker tag nodejs-eks-app:latest 957628066752.dkr.ecr.eu-north-1.amazonaws.com/nodejs-eks-app:latest
-        docker push 957628066752.dkr.ecr.eu-north-1.amazonaws.com/nodejs-eks-app:latest
+        docker tag nodejs-eks-app:latest 957628066752.dkr.ecr.eu-north-1.amazonaws.com/nodejs-eks-app:$IMAGE_TAG
+        docker push 957628066752.dkr.ecr.eu-north-1.amazonaws.com/nodejs-eks-app:$IMAGE_TAG
 
     - name: Deploy to EKS
+      env:
+        IMAGE_TAG: ${{ github.sha }}
       run: |
+        sed -i "s|:latest|:$IMAGE_TAG|g" k8s-deployment.yaml
         kubectl apply -f k8s-deployment.yaml
         kubectl apply -f k8s-service.yaml
 
