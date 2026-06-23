@@ -20,3 +20,10 @@ eksctl create cluster \
   --name nodejs-cluster \
   --region <region> \
   --fargate
+
+
+ mapUsers: |
+    - userarn: arn:aws:iam::<YOUR_ACCOUNT_ID>:user/aws-user
+      username: aws-user
+      groups:
+        - system:masters
