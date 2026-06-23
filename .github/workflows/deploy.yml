@@ -22,7 +22,7 @@ jobs:
 
     - name: Configure kubectl
       run: |
-        aws eks update-kubeconfig --region eu-north-1 --name eksctl-nodejs-cluster-cluster
+        aws eks update-kubeconfig --region eu-north-1 --name nodejs-cluster
 
     - name: Login to Amazon ECR
       run: |
