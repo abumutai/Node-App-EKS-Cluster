@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+
+    - name: Authenticate AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+
+    - name: Configure kubectl
+      run: |
+        aws eks update-kubeconfig --region us-east-1 --name nodejs-cluster
+
+
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 957628066752.dkr.ecr.us-east-1.amazonaws.com
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t nodejs-eks-app .
+        docker tag nodejs-eks-app:latest 957628066752.dkr.ecr.us-east-1.amazonaws.com/nodejs-eks-app:latest
+        docker push 957628066752.dkr.ecr.us-east-1.amazonaws.com/nodejs-eks-app:latest
+
+    - name: Deploy to EKS
+      run: |
+        kubectl apply -f k8s-deployment.yaml
+        kubectl apply -f k8s-service.yaml
+
+        
